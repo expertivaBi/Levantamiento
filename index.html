@@ -1,1071 +1,158 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Levantamiento BI · Expertiva</title>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&family=Lato:wght@300;400;700&family=Roboto+Mono:wght@400;600&display=swap" rel="stylesheet"/>
-<style>
-/* ═══ TOKENS ════════════════════════════════════════════════════ */
-:root {
-  /* Expertiva brand palette */
-  --bg:      #F5F7F8;
-  --surface: #FFFFFF;
-  --card:    #FFFFFF;
-  --line:    rgba(31,74,92,0.12);
-  --line2:   rgba(31,74,92,0.06);
-  --p:       #1F4A5C;
-  --p-hi:    #1F4A5C;
-  --p-lo:    rgba(31,74,92,0.08);
-  --p-mid:   rgba(31,74,92,0.16);
-  --p-ring:  rgba(31,74,92,0.25);
-  --acc:     #3BA37A;
-  --acc-lo:  rgba(59,163,122,0.10);
-  --acc-hi:  #2d8a67;
-  --blue-lt: #6DA6C1;
-  --blue-lo: rgba(109,166,193,0.12);
-  --t1:      #1a2e38;
-  --t2:      #4a6572;
-  --t3:      #8a9ea8;
-  --t4:      rgba(31,74,92,0.15);
-  --amber:   #e07b2a;
-  --green:   #3BA37A;
-  --fd: 'Montserrat', sans-serif;
-  --fb: 'Lato', sans-serif;
-  --fm: 'Roboto Mono', monospace;
-}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
-body{font-family:var(--fb);background:var(--bg);color:var(--t1);min-height:100vh;font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
-
-/* ═══ HERO ══════════════════════════════════════════════════════ */
-.hero{background:var(--p);border-bottom:none;padding:clamp(40px,6vw,72px) clamp(20px,5vw,60px) clamp(36px,5vw,56px);position:relative;overflow:hidden}
-.hero::after{content:'';position:absolute;top:-120px;right:-80px;width:500px;height:500px;background:radial-gradient(ellipse,rgba(109,166,193,.20) 0%,transparent 65%);pointer-events:none}
-.hero-in{max-width:900px;margin:0 auto;position:relative;z-index:1}
-.hero-tag{display:inline-flex;align-items:center;gap:10px;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.70);margin-bottom:28px}
-.hero-tag::before{content:'';width:24px;height:1px;background:var(--acc)}
-.hero h1{font-family:var(--fd);font-weight:900;font-size:clamp(28px,5vw,48px);line-height:1.08;color:#FFFFFF;margin-bottom:16px;letter-spacing:-.5px}
-.hero h1 em{color:#a8dfc9;font-style:normal}
-.hero-desc{font-size:15px;color:rgba(255,255,255,0.72);font-weight:300;max-width:480px;line-height:1.8;margin-bottom:36px}
-.hero-chips{display:flex;gap:10px;flex-wrap:wrap}
-.chip{padding:5px 14px;border:1px solid rgba(255,255,255,0.20);border-radius:6px;font-size:12px;color:rgba(255,255,255,0.60);font-weight:500}
-.chip b{color:#a8dfc9;font-weight:700}
-
-/* ═══ PROGRESS ══════════════════════════════════════════════════ */
-.nav-bar{position:sticky;top:0;z-index:200;background:rgba(255,255,255,0.97);backdrop-filter:blur(16px);border-bottom:1px solid var(--line);padding:0 clamp(16px,4vw,48px);box-shadow:0 1px 12px rgba(31,74,92,.08)}
-.nav-in{max-width:900px;margin:0 auto;display:flex;overflow-x:auto;scrollbar-width:none}
-.nav-in::-webkit-scrollbar{display:none}
-.ntab{flex:1;min-width:68px;display:flex;flex-direction:column;align-items:center;gap:5px;padding:11px 4px 9px;background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;transition:all .2s;font-family:var(--fb)}
-.nd{width:20px;height:20px;border-radius:50%;background:rgba(31,74,92,.08);color:var(--t3);font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;transition:all .2s;font-family:var(--fd)}
-.nl{font-size:10px;font-weight:600;color:var(--t3);white-space:nowrap;transition:color .2s;letter-spacing:.3px}
-.ntab.on{border-bottom-color:var(--acc)} .ntab.on .nd{background:var(--p);color:#fff} .ntab.on .nl{color:var(--p)}
-.ntab.dn .nd{background:var(--acc-lo);border:1px solid rgba(59,163,122,.3);color:var(--acc)} .ntab.dn .nl{color:var(--acc)}
-
-/* ═══ MAIN ══════════════════════════════════════════════════════ */
-.wrap{max-width:900px;margin:0 auto;padding:clamp(32px,5vw,60px) clamp(16px,5vw,48px) 120px}
-.panel{display:none}.panel.on{display:block;animation:up .3s ease}
-@keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-
-/* ═══ SECTION HEADER ════════════════════════════════════════════ */
-.sec-hd{margin-bottom:40px}
-.sec-hd h2{font-family:var(--fd);font-weight:800;font-size:clamp(20px,3vw,30px);color:var(--p);margin-bottom:8px;letter-spacing:-.3px}
-.sec-hd p{font-size:15px;color:var(--t2);font-weight:400}
-.sec-hd h2 .num{color:var(--acc);margin-right:10px}
-
-/* ═══ CARD ══════════════════════════════════════════════════════ */
-.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:clamp(20px,4vw,40px);margin-bottom:20px;position:relative;box-shadow:0 2px 12px rgba(31,74,92,.06)}
-.card-ttl{font-size:10px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--acc);margin-bottom:28px;display:flex;align-items:center;gap:10px}
-.card-ttl::after{content:'';flex:1;height:1px;background:rgba(59,163,122,.2)}
-
-/* ═══ FIELD ═════════════════════════════════════════════════════ */
-.f{margin-bottom:32px}.f:last-child{margin-bottom:0}
-.f-label{font-size:15px;font-weight:700;color:var(--p);margin-bottom:12px;display:block;line-height:1.4;font-family:var(--fd)}
-.f-sub{font-size:12px;color:var(--t3);font-weight:400;margin-top:3px;display:block}
-
-/* ═══ TEXT INPUTS ═══════════════════════════════════════════════ */
-.inp,textarea,select{
-  width:100%;font-family:var(--fb);font-size:15px;color:var(--t1);
-  background:#FAFBFC;border:1.5px solid rgba(31,74,92,.15);
-  border-radius:8px;padding:13px 16px;outline:none;
-  transition:border-color .2s,box-shadow .2s;
-}
-.inp::placeholder,textarea::placeholder{color:var(--t3);font-style:italic}
-.inp:focus,textarea:focus,select:focus{border-color:var(--acc);box-shadow:0 0 0 3px var(--acc-lo)}
-textarea{resize:vertical;min-height:80px}
-select{cursor:pointer;-webkit-appearance:none;appearance:none;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%231F4A5C' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
-  background-repeat:no-repeat;background-position:right 14px center;padding-right:42px}
-select option{background:#ffffff;color:var(--t1)}
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
-@media(max-width:600px){.g2{grid-template-columns:1fr}}
-
-/* ═══ SEGMENT (radio único — like a toggle) ══════════════════════ */
-.seg{display:flex;flex-wrap:wrap;gap:8px}
-.seg input{display:none}
-.seg label{
-  padding:11px 20px;border-radius:8px;border:1.5px solid rgba(31,74,92,.15);
-  font-size:14px;font-weight:500;color:var(--t2);cursor:pointer;
-  transition:all .18s;background:#FAFBFC;user-select:none;
-}
-.seg label:hover{border-color:var(--p);color:var(--p);background:#fff}
-.seg input:checked+label{background:var(--p);border-color:var(--p);color:#ffffff;font-weight:700}
-
-/* ═══ CHECKBOX TAGS (multi) ══════════════════════════════════════ */
-.tags{display:flex;flex-wrap:wrap;gap:8px}
-.tags input{display:none}
-.tags label{
-  padding:11px 16px;border-radius:8px;border:1.5px solid rgba(31,74,92,.15);
-  font-size:14px;font-weight:400;color:var(--t2);cursor:pointer;
-  transition:all .18s;background:#FAFBFC;user-select:none;
-  display:flex;align-items:center;gap:8px;
-}
-.tags label::before{content:'';width:14px;height:14px;border-radius:3px;border:1.5px solid rgba(31,74,92,.25);flex-shrink:0;transition:all .18s;background:transparent}
-.tags label:hover{border-color:var(--p);color:var(--p);background:#fff}
-.tags label:hover::before{border-color:var(--p)}
-.tags input:checked+label{background:var(--acc-lo);border-color:var(--acc);color:var(--p)}
-.tags input:checked+label::before{background:var(--acc);border-color:var(--acc);
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 8'%3E%3Cpath d='M1 4l2.5 2.5L9 1' stroke='white' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-  background-repeat:no-repeat;background-position:center;background-size:8px}
-
-/* ═══ KPI GRID ══════════════════════════════════════════════════ */
-.kpi-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
-.kpi-label{font-size:12px;color:var(--t2);font-weight:600}
-.kpi-badge{font-size:11px;font-weight:700;padding:3px 12px;border-radius:20px;background:rgba(31,74,92,.07);color:var(--t3);border:1px solid var(--line);transition:all .2s}
-.kpi-badge.lit{background:var(--acc-lo);color:var(--acc);border-color:rgba(59,163,122,.3)}
-.kpi-badge.hot{background:rgba(224,123,42,.10);color:var(--amber);border-color:rgba(224,123,42,.25)}
-.kgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
-@media(max-width:540px){.kgrid{grid-template-columns:1fr}}
-.ki input{display:none}
-.ki label{
-  display:flex;align-items:center;gap:10px;
-  padding:13px 15px;border-radius:8px;border:1.5px solid rgba(31,74,92,.13);
-  font-size:14px;color:var(--t2);cursor:pointer;
-  transition:all .18s;background:#FAFBFC;user-select:none;line-height:1.3
-}
-.ki label::before{content:'';width:15px;height:15px;border-radius:3px;border:1.5px solid rgba(31,74,92,.22);flex-shrink:0;transition:all .18s}
-.ki label:hover{border-color:var(--p);color:var(--p);background:#fff}
-.ki input:checked+label{border-color:var(--acc);background:var(--acc-lo);color:var(--p);font-weight:600}
-.ki input:checked+label::before{background:var(--acc);border-color:var(--acc);
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 8'%3E%3Cpath d='M1 4l2.5 2.5L9 1' stroke='white' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-  background-repeat:no-repeat;background-position:center;background-size:8px}
-.kpi-note{font-size:12px;color:var(--t2);margin-bottom:14px;padding-left:2px}
-
-/* ═══ FREQ CARDS ════════════════════════════════════════════════ */
-.freq-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-@media(max-width:520px){.freq-row{grid-template-columns:1fr 1fr}}
-.fc input{display:none}
-.fc label{
-  display:flex;flex-direction:column;align-items:center;gap:7px;
-  padding:22px 10px 18px;border-radius:10px;border:1.5px solid rgba(31,74,92,.14);
-  cursor:pointer;transition:all .18s;background:#FAFBFC;user-select:none;text-align:center
-}
-.fc label:hover{border-color:var(--p);background:#fff}
-.fc input:checked+label{border-color:var(--p);background:var(--p-lo);box-shadow:0 0 0 1px var(--p)}
-.fc-icon{font-size:28px;line-height:1}
-.fc-name{font-size:13px;font-weight:700;color:var(--t2);transition:color .18s;font-family:var(--fd)}
-.fc-desc{font-size:11px;color:var(--t3);font-weight:400}
-.fc input:checked+label .fc-name{color:var(--p)}
-
-/* ═══ NAV BUTTONS ═══════════════════════════════════════════════ */
-.nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:44px;gap:12px}
-.btn{font-family:var(--fb);font-size:14px;font-weight:600;padding:14px 32px;border-radius:10px;border:none;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:7px;letter-spacing:.2px}
-.btn-g{background:#fff;color:var(--t2);border:1.5px solid rgba(31,74,92,.2)}.btn-g:hover{color:var(--p);border-color:var(--p)}
-.btn-p{background:var(--p);color:#fff;box-shadow:0 4px 18px rgba(31,74,92,.25)}.btn-p:hover{background:#173b4a;box-shadow:0 6px 24px rgba(31,74,92,.35);transform:translateY(-1px)}
-.btn-ok{background:var(--acc);color:#fff;box-shadow:0 4px 18px rgba(59,163,122,.28)}.btn-ok:hover{transform:translateY(-1px);background:var(--acc-hi);box-shadow:0 6px 24px rgba(59,163,122,.4)}
-.btn-out{background:transparent;color:var(--p);border:1.5px solid rgba(31,74,92,.3)}.btn-out:hover{background:var(--p-lo)}
-
-/* ═══ SUMMARY ═══════════════════════════════════════════════════ */
-.sum-sec{margin-bottom:28px}
-.sum-sec-ttl{font-size:10px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--acc);margin-bottom:12px;display:flex;align-items:center;gap:8px}
-.sum-sec-ttl::after{content:'';flex:1;height:1px;background:rgba(59,163,122,.2)}
-.sum-row{display:grid;grid-template-columns:200px 1fr;gap:20px;padding:10px 0;border-bottom:1px solid var(--line2)}
-.sk{font-size:13px;font-weight:600;color:var(--t2)}.sv{font-size:14px;color:var(--t1);line-height:1.5}
-.sum-empty{font-size:13px;color:var(--t3);font-style:italic;padding:12px 0}
-
-/* ═══ CONFIRM ═══════════════════════════════════════════════════ */
-.confirm{text-align:center;padding:52px 20px}
-.confirm-icon{width:68px;height:68px;border-radius:50%;background:var(--acc-lo);border:1px solid rgba(59,163,122,.25);display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 22px}
-.confirm h2{font-family:var(--fd);font-size:24px;font-weight:800;color:var(--p);margin-bottom:10px}
-.confirm p{font-size:14px;color:var(--t2);max-width:420px;margin:0 auto 28px;line-height:1.7}
-
-/* ═══ PRINT ═════════════════════════════════════════════════════ */
-@media print{
-  @page{margin:15mm;size:A4}
-  body{background:#fff!important;color:#111!important;font-size:10.5pt}
-  .hero,.nav-bar,.nav-row,.card::before,.screen-hide{display:none!important}
-  .panel{display:block!important}
-  .card{background:#fff!important;border:1px solid #e0e0e0!important;padding:14px;margin-bottom:10px;page-break-inside:avoid;box-shadow:none!important;border-radius:0!important}
-  .card-ttl{color:#3BA37A!important;border-bottom:1px solid #e0e0e0;padding-bottom:6px;letter-spacing:1.5px}
-  .sum-sec-ttl{color:#3BA37A!important} .sum-sec-ttl::after{background:#e0e0e0!important}
-  .sum-row{border-bottom-color:#f0f0f0!important} .sk{color:#666!important} .sv{color:#111!important}
-  .wrap{padding:0}
-  .sec-hd{display:block!important}
-  .sec-hd h2{color:#111!important;font-size:14pt}
-  .print-header{display:flex!important;align-items:center;justify-content:space-between;padding-bottom:14px;border-bottom:2px solid #1F4A5C;margin-bottom:20px}
-  .print-header-logo{font-family:'Montserrat',sans-serif;font-size:20pt;font-weight:900;color:#1F4A5C}
-  .print-header-meta{font-size:9pt;color:#888;text-align:right;line-height:1.5}
-}
-.print-header{display:none}
-
-/* ═══ RESPONSIVE — MOBILE ═══════════════════════════════════════ */
-@media(max-width:480px){
-  .hero{padding:36px 20px 32px}
-  .hero h1{font-size:28px;letter-spacing:-.5px}
-  .hero-desc{font-size:14px}
-  .wrap{padding:24px 16px 100px}
-  .card{padding:20px 16px;border-radius:12px}
-  .f-label{font-size:14px}
-  .inp,textarea,select{font-size:16px;padding:13px 14px} /* 16px prevents iOS zoom */
-  .seg label{padding:12px 16px;font-size:14px;width:100%}
-  .seg{flex-direction:column;gap:6px}
-  .tags label{padding:12px 14px;font-size:14px}
-  .ki label{padding:13px 12px;font-size:14px}
-  .freq-row{grid-template-columns:1fr 1fr}
-  .fc label{padding:18px 8px 14px}
-  .fc-icon{font-size:26px}
-  .nav-row{flex-direction:column-reverse;gap:10px}
-  .nav-row .btn{width:100%;justify-content:center}
-  .ntab{min-width:60px}
-  .nl{font-size:9px}
-  .sum-row{grid-template-columns:1fr;gap:4px}
-  .sk{font-size:11px;text-transform:uppercase;letter-spacing:.5px}
-}
-@media(min-width:481px) and (max-width:768px){
-  .wrap{padding:36px 24px 100px}
-  .card{padding:24px 20px}
-  .seg label{padding:11px 18px}
-  .inp,textarea,select{font-size:16px} /* prevents iOS zoom */
-}
-</style>
-</head>
-<body>
-
-<!-- HERO -->
-<div class="hero">
-  <div class="hero-in">
-    <div class="hero-tag">Expertiva · Consultoría e Inteligencia de Negocios</div>
-    <h1>Levantamiento de<br><em>Inteligencia de Negocios</em></h1>
-    <p class="hero-desc">Complete este formulario para que podamos diseñar una solución de BI ajustada a su empresa. No requiere conocimiento técnico.</p>
-    <div class="hero-chips">
-      <div class="chip">Tiempo estimado <b>20 – 25 min</b></div>
-      <div class="chip"><b>7</b> secciones</div>
-      <div class="chip">Versión <b>3.1</b></div>
-    </div>
-  </div>
-</div>
-
-<!-- PROGRESS NAV -->
-<div class="nav-bar"><div class="nav-in">
-  <button class="ntab on" onclick="go(0)"><span class="nd">1</span><span class="nl">Contexto</span></button>
-  <button class="ntab" onclick="go(1)"><span class="nd">2</span><span class="nl">Tecnología</span></button>
-  <button class="ntab" onclick="go(2)"><span class="nd">3</span><span class="nl">Ventas</span></button>
-  <button class="ntab" onclick="go(3)"><span class="nd">4</span><span class="nl">Compras</span></button>
-  <button class="ntab" onclick="go(4)"><span class="nd">5</span><span class="nl">Inventario</span></button>
-  <button class="ntab" onclick="go(5)"><span class="nd">6</span><span class="nl">Finanzas</span></button>
-  <button class="ntab" onclick="go(6)"><span class="nd">7</span><span class="nl">Alcance</span></button>
-  <button class="ntab" onclick="go(7)"><span class="nd">8</span><span class="nl">Resumen</span></button>
-</div></div>
-
-<div class="wrap">
-
-<!-- ══════════════════════════════════════════════
-  1 · CONTEXTO
-══════════════════════════════════════════════ -->
-<div class="panel on" id="p0">
-  <div class="sec-hd">
-    <h2><span class="num">01</span>Contexto General</h2>
-    <p>Cuéntenos sobre su empresa y quiénes utilizarán los tableros.</p>
-  </div>
-
-  <div class="card">
-    <div class="card-ttl">Identificación</div>
-    <div class="g2">
-      <div class="f"><label class="f-label">Empresa</label><input class="inp" id="empresa" type="text" placeholder="Nombre o razón social"/></div>
-      <div class="f"><label class="f-label">Sector</label><input class="inp" id="sector" type="text" placeholder="Ej: Manufactura, Retail, Servicios…"/></div>
-      <div class="f"><label class="f-label">Responsable</label><input class="inp" id="responsable" type="text" placeholder="Nombre completo"/></div>
-      <div class="f"><label class="f-label">Cargo</label><input class="inp" id="cargo" type="text" placeholder="Ej: Gerente General, CFO…"/></div>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-ttl">Estructura del negocio</div>
-
-    <div class="f">
-      <label class="f-label">¿Cuántas empresas o unidades de negocio estarán involucradas?</label>
-      <div class="seg">
-        <input id="seg_n_emp_1" type="radio" name="n_emp" value="Una sola empresa"/><label for="seg_n_emp_1">Una sola empresa</label>
-        <input id="seg_n_emp_2" type="radio" name="n_emp" value="Dos empresas"/><label for="seg_n_emp_2">Dos empresas</label>
-        <input id="seg_n_emp_3" type="radio" name="n_emp" value="Tres o más"/><label for="seg_n_emp_3">Tres o más</label>
-      </div>
-      <div style="height:8px"></div>
-      <input class="inp" id="emp_det" type="text" placeholder="Indique los nombres si aplica…"/>
-    </div>
-
-    <div class="f">
-      <label class="f-label">¿Las empresas comparten clientes, proveedores o productos?</label>
-      <select id="q_comp">
-        <option value="">Seleccione una opción…</option>
-        <option>Sí — comparten clientes, proveedores y productos</option>
-        <option>Comparten clientes pero no proveedores</option>
-        <option>Comparten proveedores pero no clientes</option>
-        <option>Solo comparten algunos productos</option>
-        <option>No — operan de forma completamente independiente</option>
-      </select>
-    </div>
-
-    <div class="f">
-      <label class="f-label">¿Quiénes consultarán los tableros?<span class="f-sub">Seleccione todos los que apliquen</span></label>
-      <div class="tags">
-        <input type="checkbox" id="u1"/><label for="u1">Gerencia General</label>
-        <input type="checkbox" id="u2"/><label for="u2">Directores de área</label>
-        <input type="checkbox" id="u3"/><label for="u3">Mandos medios</label>
-        <input type="checkbox" id="u4"/><label for="u4">Equipo comercial</label>
-        <input type="checkbox" id="u5"/><label for="u5">Contabilidad / Finanzas</label>
-        <input type="checkbox" id="u6"/><label for="u6">Operaciones / Producción</label>
-        <input type="checkbox" id="u7"/><label for="u7">Logística / Inventario</label>
-      </div>
-      <div style="height:8px"></div>
-      <input class="inp" id="u_obs" type="text" placeholder="Número aproximado de usuarios…"/>
-    </div>
-
-    <div class="f">
-      <label class="f-label">¿Tienen reportes o análisis actuales?</label>
-      <div class="seg">
-        <input id="seg_rep_act_1" type="radio" name="rep_act" value="Sí, en Excel"/><label for="seg_rep_act_1">Sí, en Excel</label>
-        <input id="seg_rep_act_2" type="radio" name="rep_act" value="Algo básico"/><label for="seg_rep_act_2">Algo básico</label>
-        <input id="seg_rep_act_3" type="radio" name="rep_act" value="Nada formal"/><label for="seg_rep_act_3">Nada formal</label>
-      </div>
-    </div>
-
-    <div class="f">
-      <label class="f-label">¿Cuál es la información más crítica que hoy <em>no</em> pueden ver fácilmente?</label>
-      <textarea id="info_crit" placeholder="Ej: No vemos el margen real por producto, no tenemos visibilidad del stock en tiempo real…"></textarea>
-    </div>
-  </div>
-
-  <div class="nav-row"><div></div><button class="btn btn-p" onclick="nx()">Siguiente →</button></div>
-</div>
-
-<!-- ══════════════════════════════════════════════
-  2 · TECNOLOGÍA
-══════════════════════════════════════════════ -->
-<div class="panel" id="p1">
-  <div class="sec-hd">
-    <h2><span class="num">02</span>Fuente de Datos y Tecnología</h2>
-    <p>Información sobre sus sistemas actuales. Responda lo que pueda.</p>
-  </div>
-
-  <div class="card">
-    <div class="card-ttl">Sistema de gestión (ERP)</div>
-
-    <div class="f">
-      <label class="f-label">¿Qué software de gestión o ERP utilizan?<span class="f-sub">Puede seleccionar varios si usan más de uno</span></label>
-      <div class="tags">
-        <input type="checkbox" id="e1"/><label for="e1">SIGO</label>
-        <input type="checkbox" id="e2"/><label for="e2">Siigo</label>
-        <input type="checkbox" id="e3"/><label for="e3">SAP</label>
-        <input type="checkbox" id="e4"/><label for="e4">World Office</label>
-        <input type="checkbox" id="e5"/><label for="e5">Helisa</label>
-        <input type="checkbox" id="e6"/><label for="e6">Dynamics 365</label>
-        <input type="checkbox" id="e7"/><label for="e7">Odoo</label>
-        <input type="checkbox" id="e8"/><label for="e8">Clientify</label>
-        <input type="checkbox" id="e9"/><label for="e9">Solo Excel</label>
-        <input type="checkbox" id="e10"/><label for="e10">Otro</label>
-      </div>
-      <div style="height:8px"></div>
-      <input class="inp" id="erp_otro" type="text" placeholder="Si marcó 'Otro', especifique…"/>
-    </div>
-
-    <div class="f">
-      <label class="f-label">¿Qué módulos están activos?<span class="f-sub">Marque todos los que usen actualmente</span></label>
-      <div class="tags">
-        <input type="checkbox" id="m1"/><label for="m1">Ventas / Facturación</label>
-        <input type="checkbox" id="m2"/><label for="m2">Compras</label>
-        <input type="checkbox" id="m3"/><label for="m3">Inventario</label>
-        <input type="checkbox" id="m4"/><label for="m4">Contabilidad</label>
-        <input type="checkbox" id="m5"/><label for="m5">Cuentas por Cobrar</label>
-        <input type="checkbox" id="m6"/><label for="m6">Cuentas por Pagar</label>
-        <input type="checkbox" id="m7"/><label for="m7">CRM / Clientes</label>
-        <input type="checkbox" id="m8"/><label for="m8">Nómina / RRHH</label>
-        <input type="checkbox" id="m9"/><label for="m9">Producción / MRP</label>
-        <input type="checkbox" id="m10"/><label for="m10">Tesorería</label>
-        <input type="checkbox" id="m11"/><label for="m11">Presupuesto</label>
-      </div>
-      <div style="height:8px"></div>
-      <input class="inp" id="mod_obs" type="text" placeholder="¿Algún módulo con datos incompletos o desactualizados?"/>
-    </div>
-
-    <div class="f">
-      <label class="f-label">¿Dónde está alojado el servidor del sistema?</label>
-      <select id="q_serv">
-        <option value="">Seleccione…</option>
-        <option>En la empresa (on-premise) — acceso directo a base de datos</option>
-        <option>En la empresa (on-premise) — solo interfaz del sistema</option>
-        <option>En la nube del proveedor del ERP</option>
-        <option>En Azure / AWS / Google Cloud</option>
-        <option>No lo sé</option>
-      </select>
-    </div>
-
-    <div class="f">
-      <label class="f-label">¿Los datos históricos están completos y al día?</label>
-      <div class="seg">
-        <input id="seg_dat_cal_1" type="radio" name="dat_cal" value="Sí, están bien"/><label for="seg_dat_cal_1">Sí, están bien</label>
-        <input id="seg_dat_cal_2" type="radio" name="dat_cal" value="Hay algunas brechas"/><label for="seg_dat_cal_2">Hay algunas brechas</label>
-        <input id="seg_dat_cal_3" type="radio" name="dat_cal" value="Hay problemas de calidad"/><label for="seg_dat_cal_3">Hay problemas de calidad</label>
-      </div>
-      <div style="height:8px"></div>
-      <input class="inp" id="dat_obs" type="text" placeholder="¿Qué problemas específicos conoce?"/>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-ttl">Ecosistema Microsoft</div>
-
-    <div class="f">
-      <label class="f-label">¿Qué licencias de Microsoft 365 tienen?</label>
-      <select id="q_m365">
-        <option value="">Seleccione…</option>
-        <option>Business Basic</option>
-        <option>Business Standard</option>
-        <option>Business Premium</option>
-        <option>Microsoft 365 E3</option>
-        <option>Microsoft 365 E5</option>
-        <option>No tenemos licencias Microsoft 365</option>
-        <option>No sé qué tipo de licencia tenemos</option>
-      </select>
-    </div>
-
-    <div class="f">
-      <label class="f-label">¿Tienen Power BI?</label>
-      <div class="seg">
-        <input id="seg_pbi_1" type="radio" name="pbi" value="Power BI Pro"/><label for="seg_pbi_1">Power BI Pro</label>
-        <input id="seg_pbi_2" type="radio" name="pbi" value="Power BI Premium"/><label for="seg_pbi_2">Premium</label>
-        <input id="seg_pbi_3" type="radio" name="pbi" value="Solo Desktop (gratis)"/><label for="seg_pbi_3">Solo Desktop</label>
-        <input id="seg_pbi_4" type="radio" name="pbi" value="No tenemos"/><label for="seg_pbi_4">No tenemos</label>
-      </div>
-    </div>
-
-    <div class="f">
-      <label class="f-label">Periodicidad de actualización de los reportes</label>
-      <div class="freq-row">
-        <input id="fc_1" type="radio" name="freq" value="Tiempo real"/><label class="fc" for="fc_1">
-          <span class="fc-icon">⚡</span><span class="fc-name">Tiempo real</span><span class="fc-desc">Streaming</span>
-        </label>
-        <input id="fc_2" type="radio" name="freq" value="Cada hora"/><label class="fc" for="fc_2">
-          <span class="fc-icon">🕐</span><span class="fc-name">Cada hora</span><span class="fc-desc">Horario</span>
-        </label>
-        <input id="fc_3" type="radio" name="freq" value="Una vez al día"/><label class="fc" for="fc_3">
-          <span class="fc-icon">📅</span><span class="fc-name">Diario</span><span class="fc-desc">Una vez/día</span>
-        </label>
-        <input id="fc_4" type="radio" name="freq" value="Semanal"/><label class="fc" for="fc_4">
-          <span class="fc-icon">📆</span><span class="fc-name">Semanal</span><span class="fc-desc">Cada semana</span>
-        </label>
-      </div>
-    </div>
-  </div>
-
-  <div class="nav-row"><button class="btn btn-g" onclick="pv()">← Anterior</button><button class="btn btn-p" onclick="nx()">Siguiente →</button></div>
-</div>
-
-<!-- ══════════════════════════════════════════════
-  3 · VENTAS
-══════════════════════════════════════════════ -->
-<div class="panel" id="p2">
-  <div class="sec-hd">
-    <h2><span class="num">03</span>Tablero de Ventas</h2>
-    <p>Indicadores y contexto del área comercial.</p>
-  </div>
-
-  <div class="card">
-    <div class="card-ttl">Indicadores de Ventas</div>
-    <div class="kpi-header"><span class="kpi-label">Marque los que necesita — máximo 7 para la primera fase</span><span class="kpi-badge" id="cv">0 / 14</span></div>
-    <div class="kgrid" id="gv">
-      <div class="ki"><input type="checkbox" id="v1" onchange="kct('v',14)"/><label for="v1">Ventas totales del período</label></div>
-      <div class="ki"><input type="checkbox" id="v2" onchange="kct('v',14)"/><label for="v2">Cumplimiento de meta de ventas</label></div>
-      <div class="ki"><input type="checkbox" id="v3" onchange="kct('v',14)"/><label for="v3">Ventas por canal o segmento</label></div>
-      <div class="ki"><input type="checkbox" id="v4" onchange="kct('v',14)"/><label for="v4">Ventas por vendedor o zona</label></div>
-      <div class="ki"><input type="checkbox" id="v5" onchange="kct('v',14)"/><label for="v5">Ventas por ubicación geográfica</label></div>
-      <div class="ki"><input type="checkbox" id="v6" onchange="kct('v',14)"/><label for="v6">Ventas por método de pago</label></div>
-      <div class="ki"><input type="checkbox" id="v7" onchange="kct('v',14)"/><label for="v7">Top 10 clientes por valor</label></div>
-      <div class="ki"><input type="checkbox" id="v8" onchange="kct('v',14)"/><label for="v8">Ticket promedio por cliente</label></div>
-      <div class="ki"><input type="checkbox" id="v9" onchange="kct('v',14)"/><label for="v9">Clientes nuevos vs. recurrentes</label></div>
-      <div class="ki"><input type="checkbox" id="v10" onchange="kct('v',14)"/><label for="v10">Tasa de conversión (cotización → venta)</label></div>
-      <div class="ki"><input type="checkbox" id="v11" onchange="kct('v',14)"/><label for="v11">Devoluciones y notas crédito</label></div>
-      <div class="ki"><input type="checkbox" id="v12" onchange="kct('v',14)"/><label for="v12">Margen bruto por producto o línea</label></div>
-      <div class="ki"><input type="checkbox" id="v13" onchange="kct('v',14)"/><label for="v13">Variación vs. período anterior</label></div>
-      <div class="ki"><input type="checkbox" id="v14" onchange="kct('v',14)"/><label for="v14">Ranking productos más vendidos</label></div>
-    </div>
-    <input class="inp" id="v_ext" type="text" placeholder="¿Algún otro indicador de ventas?"/>
-  </div>
-
-  <div class="card">
-    <div class="card-ttl">Preguntas del área comercial</div>
-
-    <div class="f">
-      <label class="f-label">¿Registran cotizaciones en el sistema o solo facturas de venta?</label>
-      <select id="q_cot">
-        <option value="">Seleccione…</option>
-        <option>Cotizaciones y facturas en el mismo sistema</option>
-        <option>Cotizaciones en otra herramienta, facturas en el ERP</option>
-        <option>Solo facturas de venta</option>
-        <option>No manejamos cotizaciones formales</option>
-      </select>
-    </div>
-
-    <div class="f">
-      <label class="f-label">¿Manejan varios canales de venta?<span class="f-sub">Seleccione todos los que apliquen</span></label>
-      <div class="tags">
-        <input type="checkbox" id="ca1"/><label for="ca1">Tienda física / punto de venta</label>
-        <input type="checkbox" id="ca2"/><label for="ca2">Distribuidores / mayoristas</label>
-        <input type="checkbox" id="ca3"/><label for="ca3">E-commerce propio</label>
-        <input type="checkbox" id="ca4"/><label for="ca4">Marketplaces</label>
-        <input type="checkbox" id="ca5"/><label for="ca5">Fuerza de ventas directa</label>
-        <input type="checkbox" id="ca6"/><label for="ca6">Televentas</label>
-      </div>
-    </div>
-
-    <div class="f">
-      <label class="f-label">¿Necesitan comparar ventas vs. presupuesto o meta?</label>
-      <div class="seg">
-        <input id="seg_vmeta_1" type="radio" name="vmeta" value="Sí, desde la primera fase"/><label for="seg_vmeta_1">Sí, desde la primera fase</label>
-        <input id="seg_vmeta_2" type="radio" name="vmeta" value="No por ahora"/><label for="seg_vmeta_2">No por ahora</label>
-        <input id="seg_vmeta_3" type="radio" name="vmeta" value="En fase posterior"/><label for="seg_vmeta_3">En fase posterior</label>
-      </div>
-      <div style="height:8px"></div>
-      <input class="inp" id="meta_obs" type="text" placeholder="¿Dónde está registrada la meta hoy?"/>
-    </div>
-
-    <div class="f">
-      <label class="f-label">¿Las devoluciones y notas crédito están registradas en el sistema?</label>
-      <div class="seg">
-        <input id="seg_devol_1" type="radio" name="devol" value="Sí, completamente"/><label for="seg_devol_1">Sí</label>
-        <input id="seg_devol_2" type="radio" name="devol" value="Parcialmente"/><label for="seg_devol_2">Parcialmente</label>
-        <input id="seg_devol_3" type="radio" name="devol" value="No"/><label for="seg_devol_3">No</label>
-      </div>
-    </div>
-
-    <div class="f">
-      <label class="f-label">¿Hay información de ventas confidencial que deba restringirse?</label>
-      <div class="seg">
-        <input id="seg_vconf_1" type="radio" name="vconf" value="Sí"/><label for="seg_vconf_1">Sí</label>
-        <input id="seg_vconf_2" type="radio" name="vconf" value="No"/><label for="seg_vconf_2">No</label>
-      </div>
-      <div style="height:8px"></div>
-      <input class="inp" id="vconf_obs" type="text" placeholder="¿Qué información y quiénes no deben verla?"/>
-    </div>
-  </div>
-
-  <div class="nav-row"><button class="btn btn-g" onclick="pv()">← Anterior</button><button class="btn btn-p" onclick="nx()">Siguiente →</button></div>
-</div>
-
-<!-- ══════════════════════════════════════════════
-  4 · COMPRAS
-══════════════════════════════════════════════ -->
-<div class="panel" id="p3">
-  <div class="sec-hd">
-    <h2><span class="num">04</span>Tablero de Compras</h2>
-    <p>Indicadores de abastecimiento y proveedores.</p>
-  </div>
-
-  <div class="card">
-    <div class="card-ttl">Indicadores de Compras</div>
-    <div class="kpi-header"><span class="kpi-label">Marque los que necesita — máximo 7 para la primera fase</span><span class="kpi-badge" id="cc">0 / 12</span></div>
-    <div class="kgrid" id="gc">
-      <div class="ki"><input type="checkbox" id="c1" onchange="kct('c',12)"/><label for="c1">Gasto total en compras del período</label></div>
-      <div class="ki"><input type="checkbox" id="c2" onchange="kct('c',12)"/><label for="c2">Gasto por proveedor o categoría</label></div>
-      <div class="ki"><input type="checkbox" id="c3" onchange="kct('c',12)"/><label for="c3">Número de órdenes de compra emitidas</label></div>
-      <div class="ki"><input type="checkbox" id="c4" onchange="kct('c',12)"/><label for="c4">Tiempo promedio de entrega (lead time)</label></div>
-      <div class="ki"><input type="checkbox" id="c5" onchange="kct('c',12)"/><label for="c5">Cumplimiento de proveedores (%)</label></div>
-      <div class="ki"><input type="checkbox" id="c6" onchange="kct('c',12)"/><label for="c6">Precio promedio de compra por insumo</label></div>
-      <div class="ki"><input type="checkbox" id="c7" onchange="kct('c',12)"/><label for="c7">Variación de precio vs. período anterior</label></div>
-      <div class="ki"><input type="checkbox" id="c8" onchange="kct('c',12)"/><label for="c8">Órdenes pendientes o en tránsito</label></div>
-      <div class="ki"><input type="checkbox" id="c9" onchange="kct('c',12)"/><label for="c9">Proveedores con mayor concentración</label></div>
-      <div class="ki"><input type="checkbox" id="c10" onchange="kct('c',12)"/><label for="c10">Devoluciones a proveedores</label></div>
-      <div class="ki"><input type="checkbox" id="c11" onchange="kct('c',12)"/><label for="c11">Compras por empresa o unidad de negocio</label></div>
-      <div class="ki"><input type="checkbox" id="c12" onchange="kct('c',12)"/><label for="c12">Alertas de gasto sobre umbral mensual</label></div>
-    </div>
-    <input class="inp" id="c_ext" type="text" placeholder="¿Algún otro indicador de compras?"/>
-  </div>
-
-  <div class="card">
-    <div class="card-ttl">Preguntas del área de compras</div>
-
-    <div class="f">
-      <label class="f-label">¿Las órdenes de compra se gestionan en el sistema?</label>
-      <div class="seg">
-        <input id="seg_oc_1" type="radio" name="oc" value="Sí, completamente"/><label for="seg_oc_1">Sí, completamente</label>
-        <input id="seg_oc_2" type="radio" name="oc" value="Parcialmente"/><label for="seg_oc_2">Parcialmente</label>
-        <input id="seg_oc_3" type="radio" name="oc" value="No"/><label for="seg_oc_3">No</label>
-      </div>
-      <div style="height:8px"></div>
-      <input class="inp" id="oc_obs" type="text" placeholder="¿Cómo se aprueban las órdenes hoy?"/>
-    </div>
-
-    <div class="f">
-      <label class="f-label">¿Manejan compras en moneda extranjera?</label>
-      <div class="seg">
-        <input id="seg_mext_1" type="radio" name="mext" value="Sí"/><label for="seg_mext_1">Sí</label>
-        <input id="seg_mext_2" type="radio" name="mext" value="No"/><label for="seg_mext_2">No</label>
-      </div>
-      <div style="height:8px"></div>
-      <input class="inp" id="mext_obs" type="text" placeholder="¿En qué monedas? ¿El tipo de cambio está en el sistema?"/>
-    </div>
-
-    <div class="f">
-      <label class="f-label">¿Cuáles son los principales problemas en compras hoy?<span class="f-sub">Seleccione todos los que apliquen</span></label>
-      <div class="tags">
-        <input type="checkbox" id="pc1"/><label for="pc1">Demoras en entregas</label>
-        <input type="checkbox" id="pc2"/><label for="pc2">Proveedores incumplidos</label>
-        <input type="checkbox" id="pc3"/><label for="pc3">Sobrecostos no controlados</label>
-        <input type="checkbox" id="pc4"/><label for="pc4">Falta de visibilidad del gasto</label>
-        <input type="checkbox" id="pc5"/><label for="pc5">Compras urgentes no planeadas</label>
-        <input type="checkbox" id="pc6"/><label for="pc6">Concentración en pocos proveedores</label>
-      </div>
-      <div style="height:8px"></div>
-      <input class="inp" id="prob_c" type="text" placeholder="Otros problemas o detalles…"/>
-    </div>
-  </div>
-
-  <div class="nav-row"><button class="btn btn-g" onclick="pv()">← Anterior</button><button class="btn btn-p" onclick="nx()">Siguiente →</button></div>
-</div>
-
-<!-- ══════════════════════════════════════════════
-  5 · INVENTARIO
-══════════════════════════════════════════════ -->
-<div class="panel" id="p4">
-  <div class="sec-hd">
-    <h2><span class="num">05</span>Tablero de Inventario</h2>
-    <p>Indicadores de stock, bodegas y gestión de productos.</p>
-  </div>
-
-  <div class="card">
-    <div class="card-ttl">Indicadores de Inventario</div>
-    <div class="kpi-header"><span class="kpi-label">Marque los que necesita — máximo 7 para la primera fase</span><span class="kpi-badge" id="ci">0 / 12</span></div>
-    <div class="kgrid" id="gi">
-      <div class="ki"><input type="checkbox" id="i1" onchange="kct('i',12)"/><label for="i1">Valor total del inventario en dinero</label></div>
-      <div class="ki"><input type="checkbox" id="i2" onchange="kct('i',12)"/><label for="i2">Productos bajo stock mínimo</label></div>
-      <div class="ki"><input type="checkbox" id="i3" onchange="kct('i',12)"/><label for="i3">Rotación de inventario por producto</label></div>
-      <div class="ki"><input type="checkbox" id="i4" onchange="kct('i',12)"/><label for="i4">Días de inventario disponible</label></div>
-      <div class="ki"><input type="checkbox" id="i5" onchange="kct('i',12)"/><label for="i5">Inventario inmovilizado (sin movimiento)</label></div>
-      <div class="ki"><input type="checkbox" id="i6" onchange="kct('i',12)"/><label for="i6">Exactitud de inventario (%)</label></div>
-      <div class="ki"><input type="checkbox" id="i7" onchange="kct('i',12)"/><label for="i7">Entradas vs. salidas del período</label></div>
-      <div class="ki"><input type="checkbox" id="i8" onchange="kct('i',12)"/><label for="i8">Productos críticos por faltante</label></div>
-      <div class="ki"><input type="checkbox" id="i9" onchange="kct('i',12)"/><label for="i9">Ocupación de bodegas (%)</label></div>
-      <div class="ki"><input type="checkbox" id="i10" onchange="kct('i',12)"/><label for="i10">Inventario por categoría o familia</label></div>
-      <div class="ki"><input type="checkbox" id="i11" onchange="kct('i',12)"/><label for="i11">Costo de almacenamiento</label></div>
-      <div class="ki"><input type="checkbox" id="i12" onchange="kct('i',12)"/><label for="i12">Alertas de vencimiento de productos</label></div>
-    </div>
-    <input class="inp" id="i_ext" type="text" placeholder="¿Algún otro indicador de inventario?"/>
-  </div>
-
-  <div class="card">
-    <div class="card-ttl">Preguntas del área de inventario</div>
-
-    <div class="f">
-      <label class="f-label">¿Cuántos productos o referencias activas manejan?</label>
-      <div class="seg">
-        <input id="seg_skus_1" type="radio" name="skus" value="Menos de 100"/><label for="seg_skus_1">Menos de 100</label>
-        <input id="seg_skus_2" type="radio" name="skus" value="100 – 500"/><label for="seg_skus_2">100 – 500</label>
-        <input id="seg_skus_3" type="radio" name="skus" value="500 – 2.000"/><label for="seg_skus_3">500 – 2.000</label>
-        <input id="seg_skus_4" type="radio" name="skus" value="Más de 2.000"/><label for="seg_skus_4">Más de 2.000</label>
-      </div>
-    </div>
-
-    <div class="f">
-      <label class="f-label">¿Manejan múltiples bodegas?</label>
-      <div class="seg">
-        <input id="seg_bod_1" type="radio" name="bod" value="Solo una bodega"/><label for="seg_bod_1">Solo una</label>
-        <input id="seg_bod_2" type="radio" name="bod" value="Varias en la misma ciudad"/><label for="seg_bod_2">Varias — misma ciudad</label>
-        <input id="seg_bod_3" type="radio" name="bod" value="Bodegas en varias ciudades"/><label for="seg_bod_3">Varias ciudades</label>
-      </div>
-    </div>
-
-    <div class="f">
-      <label class="f-label">¿Qué tipos de inventario manejan?<span class="f-sub">Seleccione todos los que apliquen</span></label>
-      <div class="tags">
-        <input type="checkbox" id="it1"/><label for="it1">Materias primas</label>
-        <input type="checkbox" id="it2"/><label for="it2">Material de empaque</label>
-        <input type="checkbox" id="it3"/><label for="it3">Producto en proceso</label>
-        <input type="checkbox" id="it4"/><label for="it4">Producto terminado</label>
-        <input type="checkbox" id="it5"/><label for="it5">Mercancía para venta</label>
-        <input type="checkbox" id="it6"/><label for="it6">Repuestos y suministros</label>
-      </div>
-    </div>
-
-    <div class="f">
-      <label class="f-label">¿Las entradas y salidas se registran en tiempo real?</label>
-      <div class="seg">
-        <input id="seg_invrt_1" type="radio" name="invrt" value="Sí, tiempo real"/><label for="seg_invrt_1">Sí</label>
-        <input id="seg_invrt_2" type="radio" name="invrt" value="Hay rezagos de horas"/><label for="seg_invrt_2">Rezagos de horas</label>
-        <input id="seg_invrt_3" type="radio" name="invrt" value="Se registran al día siguiente"/><label for="seg_invrt_3">Al día siguiente</label>
-        <input id="seg_invrt_4" type="radio" name="invrt" value="Varios días de rezago"/><label for="seg_invrt_4">Varios días</label>
-      </div>
-    </div>
-  </div>
-
-  <div class="nav-row"><button class="btn btn-g" onclick="pv()">← Anterior</button><button class="btn btn-p" onclick="nx()">Siguiente →</button></div>
-</div>
-
-<!-- ══════════════════════════════════════════════
-  6 · FINANZAS
-══════════════════════════════════════════════ -->
-<div class="panel" id="p5">
-  <div class="sec-hd">
-    <h2><span class="num">06</span>Tablero de Finanzas</h2>
-    <p>Indicadores financieros y contables para la alta dirección.</p>
-  </div>
-
-  <div class="card">
-    <div class="card-ttl">Indicadores Financieros</div>
-    <div class="kpi-header"><span class="kpi-label">Marque los que necesita — máximo 7 para la primera fase</span><span class="kpi-badge" id="cf">0 / 12</span></div>
-    <div class="kgrid" id="gf">
-      <div class="ki"><input type="checkbox" id="f1" onchange="kct('f',12)"/><label for="f1">Ingresos totales del período</label></div>
-      <div class="ki"><input type="checkbox" id="f2" onchange="kct('f',12)"/><label for="f2">Utilidad bruta y margen bruto</label></div>
-      <div class="ki"><input type="checkbox" id="f3" onchange="kct('f',12)"/><label for="f3">Utilidad neta y margen neto</label></div>
-      <div class="ki"><input type="checkbox" id="f4" onchange="kct('f',12)"/><label for="f4">EBITDA</label></div>
-      <div class="ki"><input type="checkbox" id="f5" onchange="kct('f',12)"/><label for="f5">Flujo de caja operativo</label></div>
-      <div class="ki"><input type="checkbox" id="f6" onchange="kct('f',12)"/><label for="f6">Razón de liquidez corriente</label></div>
-      <div class="ki"><input type="checkbox" id="f7" onchange="kct('f',12)"/><label for="f7">Cartera y días promedio de cobro</label></div>
-      <div class="ki"><input type="checkbox" id="f8" onchange="kct('f',12)"/><label for="f8">Cuentas por pagar y días de pago</label></div>
-      <div class="ki"><input type="checkbox" id="f9" onchange="kct('f',12)"/><label for="f9">Nivel de endeudamiento</label></div>
-      <div class="ki"><input type="checkbox" id="f10" onchange="kct('f',12)"/><label for="f10">Gastos operativos por categoría</label></div>
-      <div class="ki"><input type="checkbox" id="f11" onchange="kct('f',12)"/><label for="f11">Variación vs. presupuesto</label></div>
-      <div class="ki"><input type="checkbox" id="f12" onchange="kct('f',12)"/><label for="f12">Indicadores de impuestos</label></div>
-    </div>
-    <input class="inp" id="f_ext" type="text" placeholder="¿Algún otro indicador financiero?"/>
-  </div>
-
-  <div class="card">
-    <div class="card-ttl">Preguntas del área financiera</div>
-
-    <div class="f">
-      <label class="f-label">¿La contabilidad está completamente en el ERP o usan software aparte?</label>
-      <select id="q_cont">
-        <option value="">Seleccione…</option>
-        <option>Todo en el ERP</option>
-        <option>Software contable aparte (Siigo, Helisa, World Office…)</option>
-        <option>Usamos los dos sistemas</option>
-      </select>
-      <div style="height:8px"></div>
-      <input class="inp" id="cont_obs" type="text" placeholder="¿Los cierres contables están al día?"/>
-    </div>
-
-    <div class="f">
-      <label class="f-label">¿Manejan centros de costo o unidades de negocio diferenciadas?</label>
-      <div class="seg">
-        <input id="seg_ccos_1" type="radio" name="ccos" value="Sí"/><label for="seg_ccos_1">Sí</label>
-        <input id="seg_ccos_2" type="radio" name="ccos" value="No"/><label for="seg_ccos_2">No</label>
-      </div>
-      <div style="height:8px"></div>
-      <input class="inp" id="ccos_obs" type="text" placeholder="¿Cuáles son los centros de costo principales?"/>
-    </div>
-
-    <div class="f">
-      <label class="f-label">Si hay varias empresas, ¿cómo prefieren ver los resultados?</label>
-      <div class="seg">
-        <input id="seg_vfin_1" type="radio" name="vfin" value="Consolidado"/><label for="seg_vfin_1">Consolidado</label>
-        <input id="seg_vfin_2" type="radio" name="vfin" value="Comparativo lado a lado"/><label for="seg_vfin_2">Comparativo</label>
-        <input id="seg_vfin_3" type="radio" name="vfin" value="Tableros separados"/><label for="seg_vfin_3">Separados</label>
-        <input id="seg_vfin_4" type="radio" name="vfin" value="No aplica"/><label for="seg_vfin_4">No aplica</label>
-      </div>
-    </div>
-
-    <div class="f">
-      <label class="f-label">¿Hay información financiera restringida a ciertos usuarios?</label>
-      <div class="seg">
-        <input id="seg_fconf_1" type="radio" name="fconf" value="Sí"/><label for="seg_fconf_1">Sí</label>
-        <input id="seg_fconf_2" type="radio" name="fconf" value="No"/><label for="seg_fconf_2">No</label>
-      </div>
-      <div style="height:8px"></div>
-      <input class="inp" id="fconf_obs" type="text" placeholder="¿Qué información y quiénes no deben acceder?"/>
-    </div>
-  </div>
-
-  <div class="nav-row"><button class="btn btn-g" onclick="pv()">← Anterior</button><button class="btn btn-p" onclick="nx()">Siguiente →</button></div>
-</div>
-
-<!-- ══════════════════════════════════════════════
-  7 · ALCANCE
-══════════════════════════════════════════════ -->
-<div class="panel" id="p6">
-  <div class="sec-hd">
-    <h2><span class="num">07</span>Alcance y Expectativas</h2>
-    <p>Últimas preguntas para dimensionar el proyecto correctamente.</p>
-  </div>
-
-  <div class="card">
-    <div class="card-ttl">Tiempos y entregables</div>
-
-    <div class="f">
-      <label class="f-label">¿Cuándo necesita los primeros tableros operativos?</label>
-      <div class="seg">
-        <input id="seg_fecha_1" type="radio" name="fecha" value="En el próximo mes"/><label for="seg_fecha_1">En 1 mes</label>
-        <input id="seg_fecha_2" type="radio" name="fecha" value="En 2 meses"/><label for="seg_fecha_2">En 2 meses</label>
-        <input id="seg_fecha_3" type="radio" name="fecha" value="En el trimestre"/><label for="seg_fecha_3">En el trimestre</label>
-        <input id="seg_fecha_4" type="radio" name="fecha" value="Soy flexible"/><label for="seg_fecha_4">Soy flexible</label>
-      </div>
-      <div style="height:8px"></div>
-      <input class="inp" id="fecha_obs" type="text" placeholder="¿Hay algún hito del negocio que considerar?"/>
-    </div>
-
-    <div class="f">
-      <label class="f-label">¿Cuánto historial de datos necesitan visualizar?</label>
-      <div class="seg">
-        <input id="seg_hist_1" type="radio" name="hist" value="Últimos 6 meses"/><label for="seg_hist_1">6 meses</label>
-        <input id="seg_hist_2" type="radio" name="hist" value="Último año"/><label for="seg_hist_2">1 año</label>
-        <input id="seg_hist_3" type="radio" name="hist" value="Últimos 3 años"/><label for="seg_hist_3">3 años</label>
-        <input id="seg_hist_4" type="radio" name="hist" value="Todo el disponible"/><label for="seg_hist_4">Todo el disponible</label>
-      </div>
-    </div>
-
-    <div class="f">
-      <label class="f-label">¿Los usuarios necesitarán exportar datos a Excel?</label>
-      <div class="seg">
-        <input id="seg_exp_1" type="radio" name="exp" value="Sí, es importante"/><label for="seg_exp_1">Sí</label>
-        <input id="seg_exp_2" type="radio" name="exp" value="A veces"/><label for="seg_exp_2">A veces</label>
-        <input id="seg_exp_3" type="radio" name="exp" value="No es necesario"/><label for="seg_exp_3">No</label>
-      </div>
-    </div>
-
-    <div class="f">
-      <label class="f-label">¿Tienen definidos rangos semáforo para los indicadores?</label>
-      <div class="seg">
-        <input id="seg_sem_1" type="radio" name="sem" value="Sí, para la mayoría"/><label for="seg_sem_1">Sí, para la mayoría</label>
-        <input id="seg_sem_2" type="radio" name="sem" value="Para algunos"/><label for="seg_sem_2">Para algunos</label>
-        <input id="seg_sem_3" type="radio" name="sem" value="Los definimos juntos"/><label for="seg_sem_3">Los definimos juntos</label>
-      </div>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-ttl">Modelo de trabajo</div>
-
-    <div class="f">
-      <label class="f-label">¿Cómo prefieren trabajar en el proyecto?</label>
-      <div class="seg">
-        <input id="seg_modelo_1" type="radio" name="modelo" value="Llave en mano"/><label for="seg_modelo_1">Llave en mano</label>
-        <input id="seg_modelo_2" type="radio" name="modelo" value="Participación activa"/><label for="seg_modelo_2">Participación activa</label>
-        <input id="seg_modelo_3" type="radio" name="modelo" value="Modelo mixto"/><label for="seg_modelo_3">Mixto</label>
-      </div>
-    </div>
-
-    <div class="f">
-      <label class="f-label">¿Han trabajado antes con consultores externos de datos?</label>
-      <div class="seg">
-        <input id="seg_exprev_1" type="radio" name="exprev" value="Sí, buena experiencia"/><label for="seg_exprev_1">Sí, bien</label>
-        <input id="seg_exprev_2" type="radio" name="exprev" value="Sí, con dificultades"/><label for="seg_exprev_2">Sí, con dificultades</label>
-        <input id="seg_exprev_3" type="radio" name="exprev" value="No, primera vez"/><label for="seg_exprev_3">Primera vez</label>
-      </div>
-      <div style="height:8px"></div>
-      <input class="inp" id="exprev_obs" type="text" placeholder="¿Qué funcionó o qué mejoraría?"/>
-    </div>
-
-    <div class="g2">
-      <div class="f"><label class="f-label">Contacto técnico</label><input class="inp" id="contacto" type="text" placeholder="Nombre y cargo…"/></div>
-      <div class="f"><label class="f-label">Correo electrónico</label><input class="inp" id="email" type="email" placeholder="correo@empresa.com"/></div>
-    </div>
-
-    <div class="f">
-      <label class="f-label">¿Algo más que quiera que sepamos antes de comenzar?</label>
-      <textarea id="final" placeholder="Expectativas, restricciones, preguntas, inquietudes…" style="min-height:80px"></textarea>
-    </div>
-  </div>
-
-  <div class="nav-row"><button class="btn btn-g" onclick="pv()">← Anterior</button><button class="btn btn-p" onclick="nx()">Ver resumen →</button></div>
-</div>
-
-<!-- ══════════════════════════════════════════════
-  8 · RESUMEN
-══════════════════════════════════════════════ -->
-<div class="panel" id="p7">
-  <div class="print-header">
-    <div class="print-header-logo">EXPERTIVA</div>
-    <div class="print-header-meta">Consultoría e Inteligencia de Negocios<br>Levantamiento de Información</div>
-  </div>
-
-  <div class="sec-hd screen-hide">
-    <h2><span class="num">08</span>Resumen</h2>
-    <p>Revise la información antes de enviar. Puede volver a cualquier sección para corregir.</p>
-  </div>
-
-  <div class="card" id="res-card"><!-- JS --></div>
-
-  <div class="card screen-hide" style="background:linear-gradient(135deg,rgba(139,92,246,.12),rgba(139,92,246,.05));border-color:rgba(139,92,246,.2)">
-    <div style="text-align:center;padding:8px 0">
-      <p style="color:var(--t2);font-size:13px;margin-bottom:20px;line-height:1.7">Al enviar, Expertiva recibirá este levantamiento y se pondrá en contacto para definir los próximos pasos.</p>
-      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
-        <button class="btn btn-g" onclick="pv()">← Revisar</button>
-        <button class="btn btn-out" onclick="window.print()">🖨 Imprimir / PDF</button>
-        <button class="btn btn-ok" onclick="enviar()">✓ Confirmar y Enviar</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-</div><!-- /wrap -->
-
-<script>
-/* ── CONFIG ────────────────────────────────── */
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxWR7OEUyBmUAKMJu82dD65VqhlxQ0XSbEepGJ60UY_CujZm0FORY0wvFjvMFtWerlctw/exec';
-
-/* ── NAV ───────────────────────────────────── */
-let cur=0;
-function go(i){
-  document.querySelectorAll('.panel').forEach((p,j)=>p.classList.toggle('on',j===i));
-  document.querySelectorAll('.ntab').forEach((t,j)=>{
-    t.classList.toggle('on',j===i);
-    t.classList.toggle('dn',j<i);
-  });
-  cur=i;window.scrollTo({top:0,behavior:'smooth'});
-  if(i===7)buildSum();
-}
-const nx=()=>cur<7&&go(cur+1);
-const pv=()=>cur>0&&go(cur-1);
-
-/* ── KPI COUNTER ───────────────────────────── */
-function kct(p,max){
-  const n=document.querySelectorAll(`#g${p} input:checked`).length;
-  const el=document.getElementById(`c${p}`);
-  el.textContent=`${n} / ${max}`;
-  el.className='kpi-badge'+(n===0?'':n>7?' hot':' lit');
-}
-
-/* ── VALUE HELPERS ─────────────────────────── */
-const $ =id=>document.getElementById(id);
-const v =id=>$(id)?.value?.trim()||'';
-const rd=nm=>{const e=document.querySelector(`input[name="${nm}"]:checked`);return e?e.value:''};
-const ck=ids=>ids.map(id=>{const e=$(id);if(!e||!e.checked)return null;return document.querySelector(`label[for="${id}"]`)?.textContent?.trim()||id}).filter(Boolean).join(', ')||'';
-const kp=(p,n)=>{const r=[];for(let k=1;k<=n;k++)if($(`${p}${k}`)?.checked)r.push(document.querySelector(`label[for="${p}${k}"]`)?.textContent?.trim());return r};
-const sl=id=>$(id)?.value||'';
-const combo=(a,b)=>[a,b].filter(Boolean).join(' — ');
-
-/* ── SUMMARY ROW ───────────────────────────── */
-const srow=(k,val)=>val?`<div class="sum-row"><div class="sk">${k}</div><div class="sv">${val}</div></div>`:'';
-const slist=(k,items,extra='')=>{
-  const all=[...items,...(extra?[`<em style="color:var(--t3)">${extra}</em>`]:[])];
-  return all.length?`<div class="sum-row"><div class="sk">${k}</div><div class="sv">${all.join('<br>')}</div></div>`:'';
-};
-function ssec(title,rows){
-  const r=rows.filter(Boolean).join('');
-  if(!r)return'';
-  return`<div class="sum-sec"><div class="sum-sec-ttl">${title}</div>${r}</div>`;
-}
-
-/* ── BUILD SUMMARY ─────────────────────────── */
-function buildSum(){
-  const html=`
-  ${ssec('Contexto General',[
-    srow('Empresa',v('empresa')),
-    srow('Sector',v('sector')),
-    srow('Responsable',combo(v('responsable'),v('cargo'))),
-    srow('Empresas involucradas',combo(rd('n_emp'),v('emp_det'))),
-    srow('Comparten recursos',sl('q_comp')),
-    srow('Usuarios de tableros',combo(ck(['u1','u2','u3','u4','u5','u6','u7']),v('u_obs'))),
-    srow('Reportes actuales',rd('rep_act')),
-    srow('Información crítica faltante',v('info_crit')),
-  ])}
-  ${ssec('Tecnología',[
-    srow('ERP / Software',combo(ck(['e1','e2','e3','e4','e5','e6','e7','e8','e9','e10']),v('erp_otro'))),
-    srow('Módulos activos',combo(ck(['m1','m2','m3','m4','m5','m6','m7','m8','m9','m10','m11']),v('mod_obs'))),
-    srow('Servidor',sl('q_serv')),
-    srow('Calidad de datos',combo(rd('dat_cal'),v('dat_obs'))),
-    srow('Licencia M365',sl('q_m365')),
-    srow('Power BI',rd('pbi')),
-    srow('Periodicidad de reportes',rd('freq')),
-  ])}
-  ${ssec('Tablero Ventas',[
-    slist('Indicadores seleccionados',kp('v',14),v('v_ext')),
-    srow('Cotizaciones en sistema',sl('q_cot')),
-    srow('Canales de venta',ck(['ca1','ca2','ca3','ca4','ca5','ca6'])),
-    srow('Ventas vs. meta',combo(rd('vmeta'),v('meta_obs'))),
-    srow('Devoluciones registradas',rd('devol')),
-    srow('Información confidencial',combo(rd('vconf'),v('vconf_obs'))),
-  ])}
-  ${ssec('Tablero Compras',[
-    slist('Indicadores seleccionados',kp('c',12),v('c_ext')),
-    srow('Órdenes en sistema',combo(rd('oc'),v('oc_obs'))),
-    srow('Moneda extranjera',combo(rd('mext'),v('mext_obs'))),
-    srow('Problemas principales',combo(ck(['pc1','pc2','pc3','pc4','pc5','pc6']),v('prob_c'))),
-  ])}
-  ${ssec('Tablero Inventario',[
-    slist('Indicadores seleccionados',kp('i',12),v('i_ext')),
-    srow('Número de SKUs',rd('skus')),
-    srow('Bodegas',rd('bod')),
-    srow('Tipos de inventario',ck(['it1','it2','it3','it4','it5','it6'])),
-    srow('Registro tiempo real',rd('invrt')),
-  ])}
-  ${ssec('Tablero Finanzas',[
-    slist('Indicadores seleccionados',kp('f',12),v('f_ext')),
-    srow('Contabilidad',combo(sl('q_cont'),v('cont_obs'))),
-    srow('Centros de costo',combo(rd('ccos'),v('ccos_obs'))),
-    srow('Visualización multi-empresa',rd('vfin')),
-    srow('Info. restringida',combo(rd('fconf'),v('fconf_obs'))),
-  ])}
-  ${ssec('Alcance y Expectativas',[
-    srow('Fecha objetivo',combo(rd('fecha'),v('fecha_obs'))),
-    srow('Historial requerido',rd('hist')),
-    srow('Exportar a Excel',rd('exp')),
-    srow('Semáforos definidos',rd('sem')),
-    srow('Modelo de trabajo',rd('modelo')),
-    srow('Experiencia previa',combo(rd('exprev'),v('exprev_obs'))),
-    srow('Contacto técnico',v('contacto')),
-    srow('Correo',v('email')),
-    srow('Comentarios',v('final')),
-  ])}`;
-  $('res-card').innerHTML=html||'<p class="sum-empty">No se han registrado respuestas aún.</p>';
-}
-
-/* ── COLLECT DATA ──────────────────────────── */
-function collect(){
-  return{
-    fecha_envio:new Date().toLocaleString('es-CO'),
-    empresa:v('empresa'),sector:v('sector'),responsable:v('responsable'),cargo:v('cargo'),
-    num_empresas:rd('n_emp'),empresas_det:v('emp_det'),
-    comparten:sl('q_comp'),
-    usuarios:ck(['u1','u2','u3','u4','u5','u6','u7']),usuarios_obs:v('u_obs'),
-    reportes:rd('rep_act'),info_critica:v('info_crit'),
-    erp:ck(['e1','e2','e3','e4','e5','e6','e7','e8','e9','e10']),erp_otro:v('erp_otro'),
-    modulos:ck(['m1','m2','m3','m4','m5','m6','m7','m8','m9','m10','m11']),modulos_obs:v('mod_obs'),
-    servidor:sl('q_serv'),datos_calidad:rd('dat_cal'),datos_obs:v('dat_obs'),
-    m365:sl('q_m365'),powerbi:rd('pbi'),frecuencia:rd('freq'),
-    kpi_ventas:kp('v',14).join(' | '),kpi_v_extra:v('v_ext'),
-    cotizaciones:sl('q_cot'),canales:ck(['ca1','ca2','ca3','ca4','ca5','ca6']),
-    vs_meta:rd('vmeta'),meta_obs:v('meta_obs'),devoluciones:rd('devol'),
-    ventas_conf:rd('vconf'),vconf_obs:v('vconf_obs'),
-    kpi_compras:kp('c',12).join(' | '),kpi_c_extra:v('c_ext'),
-    oc:rd('oc'),oc_obs:v('oc_obs'),moneda_ext:rd('mext'),mext_obs:v('mext_obs'),
-    prob_compras:ck(['pc1','pc2','pc3','pc4','pc5','pc6']),prob_c_obs:v('prob_c'),
-    kpi_inv:kp('i',12).join(' | '),kpi_i_extra:v('i_ext'),
-    skus:rd('skus'),bodegas:rd('bod'),
-    tipos_inv:ck(['it1','it2','it3','it4','it5','it6']),inv_rt:rd('invrt'),
-    kpi_fin:kp('f',12).join(' | '),kpi_f_extra:v('f_ext'),
-    contabilidad:sl('q_cont'),cont_obs:v('cont_obs'),
-    centros_costo:rd('ccos'),ccos_obs:v('ccos_obs'),
-    vis_financiero:rd('vfin'),fin_conf:rd('fconf'),fconf_obs:v('fconf_obs'),
-    fecha:rd('fecha'),fecha_obs:v('fecha_obs'),historial:rd('hist'),
-    exportar:rd('exp'),semaforos:rd('sem'),
-    modelo:rd('modelo'),exprev:rd('exprev'),exprev_obs:v('exprev_obs'),
-    contacto:v('contacto'),email:v('email'),comentarios:v('final'),
-  };
-}
-
-/* ── SEND ──────────────────────────────────── */
-async function enviar(){
-  const empresa=v('empresa');
-  if(!empresa){alert('Complete el nombre de la empresa en la Sección 1 antes de enviar.');go(0);return;}
-  // URL configurada correctamente
-  const btn=document.querySelector('.btn-ok');
-  btn.textContent='Enviando…';btn.disabled=true;
-  try{
-    await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(collect())});
-    $('res-card').innerHTML=`<div class="confirm"><div class="confirm-icon">✓</div><h2>¡Enviado!</h2><p>Las respuestas de <strong>${empresa}</strong> fueron registradas. El equipo de Expertiva se pondrá en contacto en las próximas <strong>24 horas</strong>.</p><button class="btn btn-out" onclick="window.print()">🖨 Guardar copia PDF</button></div>`;
-    document.querySelector('#p7 .card:last-child').style.display='none';
-  }catch(e){
-    btn.textContent='✓ Confirmar y Enviar';btn.disabled=false;
-    alert('Error al conectar con Google Sheets.\nVerifica la URL del script.\n\n'+e.message);
+// ═══════════════════════════════════════════════════════════════════
+//  METRIKA GROUP — Levantamiento BI
+//  Google Apps Script — Receptor del formulario HTML
+//
+//  INSTRUCCIONES:
+//  1. Ve a script.google.com → Nuevo proyecto
+//  2. Borra todo y pega este código
+//  3. Reemplaza SHEET_ID con el ID de tu Google Sheet
+//  4. Implementar → Nueva implementación → Web App
+//     · Ejecutar como: Yo
+//     · Acceso: Cualquier persona
+//  5. Copia la URL /exec y pégala en index.html (constante SCRIPT_URL)
+// ═══════════════════════════════════════════════════════════════════
+
+const SHEET_ID   = 'PEGA_AQUÍ_EL_ID_DE_TU_GOOGLE_SHEET';
+const SHEET_NAME = 'Respuestas';
+
+// Columnas — orden exacto en que aparecerán en el Sheet
+const COLS = [
+  'fecha_envio',
+  // ── Contexto
+  'empresa', 'sector', 'responsable', 'cargo',
+  'num_empresas', 'empresas_det',
+  'comparten',
+  'usuarios', 'usuarios_obs',
+  'reportes', 'info_critica',
+  // ── Tecnología
+  'erp', 'erp_otro',
+  'modulos', 'modulos_obs',
+  'servidor',
+  'datos_calidad', 'datos_obs',
+  'm365', 'powerbi', 'frecuencia',
+  // ── Ventas
+  'kpi_ventas', 'kpi_v_extra',
+  'cotizaciones', 'canales',
+  'vs_meta', 'meta_obs',
+  'devoluciones',
+  'ventas_conf', 'vconf_obs',
+  // ── Compras
+  'kpi_compras', 'kpi_c_extra',
+  'oc', 'oc_obs',
+  'moneda_ext', 'mext_obs',
+  'prob_compras', 'prob_c_obs',
+  // ── Inventario
+  'kpi_inv', 'kpi_i_extra',
+  'skus', 'bodegas',
+  'tipos_inv', 'inv_rt',
+  // ── Finanzas
+  'kpi_fin', 'kpi_f_extra',
+  'contabilidad', 'cont_obs',
+  'centros_costo', 'ccos_obs',
+  'vis_financiero',
+  'fin_conf', 'fconf_obs',
+  // ── Alcance
+  'fecha', 'fecha_obs',
+  'historial',
+  'exportar', 'semaforos',
+  'modelo',
+  'exprev', 'exprev_obs',
+  'contacto', 'email',
+  'comentarios',
+];
+
+// ── Encabezados legibles (misma cantidad y orden que COLS) ──────────
+const HEADERS = [
+  'Fecha de envío',
+  'Empresa', 'Sector', 'Responsable', 'Cargo',
+  'Nº empresas', 'Detalle empresas',
+  'Comparten recursos',
+  'Usuarios tableros', 'Obs. usuarios',
+  'Reportes actuales', 'Info crítica faltante',
+  'ERP / Software', 'Otro ERP',
+  'Módulos activos', 'Obs. módulos',
+  'Servidor',
+  'Calidad datos', 'Obs. datos',
+  'Licencia M365', 'Power BI', 'Periodicidad reportes',
+  'KPIs Ventas', 'Otros KPIs Ventas',
+  'Cotizaciones en sistema', 'Canales de venta',
+  'Ventas vs meta', 'Obs. meta',
+  'Devoluciones registradas',
+  'Info ventas confidencial', 'Obs. confidencialidad ventas',
+  'KPIs Compras', 'Otros KPIs Compras',
+  'OC en sistema', 'Obs. OC',
+  'Moneda extranjera', 'Obs. moneda',
+  'Problemas compras', 'Obs. problemas compras',
+  'KPIs Inventario', 'Otros KPIs Inventario',
+  'Nº SKUs', 'Bodegas',
+  'Tipos inventario', 'Tiempo real inventario',
+  'KPIs Finanzas', 'Otros KPIs Finanzas',
+  'Contabilidad', 'Obs. contabilidad',
+  'Centros de costo', 'Obs. centros costo',
+  'Visualización multi-empresa',
+  'Info financiera restringida', 'Obs. restricción financiera',
+  'Fecha objetivo', 'Obs. fecha',
+  'Historial requerido',
+  'Exportar Excel', 'Semáforos',
+  'Modelo de trabajo',
+  'Experiencia previa', 'Obs. experiencia',
+  'Contacto técnico', 'Email',
+  'Comentarios finales',
+];
+
+function doPost(e) {
+  try {
+    // Acepta JSON directo (fetch) o campo 'data' (form submit)
+    let data;
+    if (e.postData && e.postData.contents) {
+      try {
+        data = JSON.parse(e.postData.contents);
+      } catch(_) {
+        // Si falla, intentar como parámetro de formulario
+        data = JSON.parse(e.parameter.data || '{}');
+      }
+    } else {
+      data = JSON.parse(e.parameter.data || '{}');
+    }
+    const ss   = SpreadsheetApp.openById(SHEET_ID);
+    let sheet  = ss.getSheetByName(SHEET_NAME);
+
+    if (!sheet) {
+      sheet = ss.insertSheet(SHEET_NAME);
+      _addHeaders(sheet);
+    } else if (sheet.getLastRow() === 0) {
+      _addHeaders(sheet);
+    }
+
+    const row = COLS.map(k => data[k] !== undefined ? String(data[k]) : '');
+    sheet.appendRow(row);
+    sheet.autoResizeColumns(1, Math.min(6, COLS.length));
+
+    return _json({ status: 'ok', empresa: data.empresa || '' });
+  } catch(err) {
+    return _json({ status: 'error', mensaje: err.message });
   }
 }
-</script>
-</body>
-</html>
+
+function doGet() {
+  return ContentService
+    .createTextOutput('✅ Metrika BI — Apps Script activo.')
+    .setMimeType(ContentService.MimeType.TEXT);
+}
+
+function _addHeaders(sheet) {
+  sheet.appendRow(HEADERS);
+  const hdr = sheet.getRange(1, 1, 1, HEADERS.length);
+  hdr.setBackground('#0F1E38')
+     .setFontColor('#FFFFFF')
+     .setFontWeight('bold')
+     .setFontSize(10)
+     .setWrap(false);
+  sheet.setFrozenRows(1);
+}
+
+function _json(obj) {
+  return ContentService
+    .createTextOutput(JSON.stringify(obj))
+    .setMimeType(ContentService.MimeType.JSON);
+}
